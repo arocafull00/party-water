@@ -18,6 +18,7 @@ export interface GameState {
   currentPlayerIndex: number
   diceValue: number | null
   currentQuestion: string | null
+  currentAnswer: string | null
   currentTileType: TileType | null
   isQuestionModalOpen: boolean
   timer: number

@@ -7,7 +7,7 @@ interface GameStore extends GameState {
   isWordRevealed: boolean
   setDiceValue: (value: number) => void
   movePlayer: (steps: number) => void
-  setCurrentQuestion: (question: string, tileType: TileType) => void
+  setCurrentQuestion: (question: string, tileType: TileType, answer?: string) => void
   openQuestionModal: () => void
   closeQuestionModal: () => void
   startGame: () => void
@@ -53,6 +53,7 @@ export const useGameStore = create<GameStore>()(
       currentPlayerIndex: 0,
       diceValue: null,
       currentQuestion: null,
+      currentAnswer: null,
       currentTileType: null,
       isQuestionModalOpen: false,
       isGameStarted: false,
@@ -78,8 +79,8 @@ export const useGameStore = create<GameStore>()(
         })
       },
 
-      setCurrentQuestion: (question, tileType) =>
-        set({ currentQuestion: question, currentTileType: tileType }),
+      setCurrentQuestion: (question, tileType, answer) =>
+        set({ currentQuestion: question, currentTileType: tileType, currentAnswer: answer || null }),
 
       openQuestionModal: () => set({ isQuestionModalOpen: true, timer: 60, isGameStarted: false, isWordRevealed: false }),
 
@@ -87,6 +88,7 @@ export const useGameStore = create<GameStore>()(
         set({
           isQuestionModalOpen: false,
           currentQuestion: null,
+          currentAnswer: null,
           currentTileType: null,
           diceValue: null,
           isGameStarted: false,
@@ -121,6 +123,7 @@ export const useGameStore = create<GameStore>()(
           players: updatedPlayers,
           isQuestionModalOpen: false,
           currentQuestion: null,
+          currentAnswer: null,
           currentTileType: null,
           diceValue: null,
           isGameStarted: false,
@@ -141,6 +144,7 @@ export const useGameStore = create<GameStore>()(
           currentPlayerIndex: nextPlayerIndex,
           isQuestionModalOpen: false,
           currentQuestion: null,
+          currentAnswer: null,
           currentTileType: null,
           diceValue: null,
           isGameStarted: false,
@@ -154,6 +158,7 @@ export const useGameStore = create<GameStore>()(
           currentPlayerIndex: 0,
           diceValue: null,
           currentQuestion: null,
+          currentAnswer: null,
           currentTileType: null,
           isQuestionModalOpen: false,
           isGameStarted: false,

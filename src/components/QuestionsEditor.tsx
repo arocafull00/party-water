@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom"
 import type { TileType } from "@/types/game"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, Plus, Trash2 } from "lucide-react"
+import popQuestions from "@/data/questions/pop.json"
 
 const TILE_COLORS: Record<TileType, string> = {
   DIBUJAR: "bg-blue-500",
@@ -22,36 +23,61 @@ const TILE_TYPES: TileType[] = [
 
 const STORAGE_KEY = "party-water-questions"
 
-function loadQuestionsFromStorage(): Record<TileType, string[]> {
+type PopQuestion = { question: string; answer: string }
+type QuestionItem = string | PopQuestion
+type QuestionsMap = {
+  DIBUJAR: string[]
+  "CULTURA POPULAR": PopQuestion[]
+  "ADIVINA LA PALABRA": string[]
+  "QUIÉN ES MÁS PROBABLE QUE": string[]
+  MÍMICA: string[]
+}
+
+function loadQuestionsFromStorage(): QuestionsMap {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     try {
       const parsed = JSON.parse(stored)
-      const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
-      for (const type of TILE_TYPES) {
-        result[type] = parsed[type] || []
+      const popQuestions = parsed["CULTURA POPULAR"] || []
+      const migratedPopQuestions = popQuestions.map((item: string | PopQuestion) => {
+        if (typeof item === "string") {
+          return { question: item, answer: "" }
+        }
+        return item
+      })
+      
+      const result: QuestionsMap = {
+        DIBUJAR: parsed.DIBUJAR || [],
+        "CULTURA POPULAR": migratedPopQuestions,
+        "ADIVINA LA PALABRA": parsed["ADIVINA LA PALABRA"] || [],
+        "QUIÉN ES MÁS PROBABLE QUE": parsed["QUIÉN ES MÁS PROBABLE QUE"] || [],
+        MÍMICA: parsed.MÍMICA || [],
       }
       return result
     } catch {
-      const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
-      for (const type of TILE_TYPES) {
-        result[type] = []
+      return {
+        DIBUJAR: [],
+        "CULTURA POPULAR": [],
+        "ADIVINA LA PALABRA": [],
+        "QUIÉN ES MÁS PROBABLE QUE": [],
+        MÍMICA: [],
       }
-      return result
     }
   }
-  const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
-  for (const type of TILE_TYPES) {
-    result[type] = []
+  return {
+    DIBUJAR: [],
+    "CULTURA POPULAR": [],
+    "ADIVINA LA PALABRA": [],
+    "QUIÉN ES MÁS PROBABLE QUE": [],
+    MÍMICA: [],
   }
-  return result
 }
 
-function saveQuestionsToStorage(questions: Record<TileType, string[]>) {
+function saveQuestionsToStorage(questions: QuestionsMap) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(questions))
 }
 
-function loadDefaultQuestions(): Record<TileType, string[]> {
+function loadDefaultQuestions(): QuestionsMap {
   return {
     DIBUJAR: [
       "Kebab",
@@ -65,22 +91,7 @@ function loadDefaultQuestions(): Record<TileType, string[]> {
       "Cultura popular de water",
       "Amumu",
     ],
-    "CULTURA POPULAR": [
-      "Cuanto vale un kebab completo en el toni?",
-      "Que numero es el kebab con queso?",
-      "Que dia es el cumple de water?",
-      "Cuantos miembros hay actualmente en water?",
-      "Cuantos emoticonos hay en el nombre de whatsapp de water?",
-      "Que lleva la pizza xema?",
-      "Cuanto vale el bocadillo \"Senda\"?",
-      "Ordena los ganadores del balon de oro",
-      "De donde viene el nombre de \"Waterpolla\"?",
-      "Por que se creo el grupo \"Waterpollo\"?",
-      "Que estudió richar",
-      "De que esta hecho el te favorito de Mora?",
-      "Bebida alcoholica que no encontraba Loro en 2018",
-      "Como se llamaba la ciudad en la que estuvo trabajando Poten en Alemania?",
-    ],
+    "CULTURA POPULAR": popQuestions.questions,
     "ADIVINA LA PALABRA": [
       "Correa",
       "Embutido del pueblo de Folk",
@@ -122,15 +133,17 @@ function loadDefaultQuestions(): Record<TileType, string[]> {
 
 export function QuestionsEditor() {
   const navigate = useNavigate()
-  const [questions, setQuestions] = useState<Record<TileType, string[]>>(() => {
+  const [questions, setQuestions] = useState<QuestionsMap>(() => {
     const stored = loadQuestionsFromStorage()
     const defaults = loadDefaultQuestions()
     
-    const merged: Record<TileType, string[]> = {} as Record<TileType, string[]>
-    for (const type of TILE_TYPES) {
-      merged[type] = stored[type] || defaults[type] || []
+    return {
+      DIBUJAR: stored.DIBUJAR.length > 0 ? stored.DIBUJAR : defaults.DIBUJAR,
+      "CULTURA POPULAR": stored["CULTURA POPULAR"].length > 0 ? stored["CULTURA POPULAR"] : defaults["CULTURA POPULAR"],
+      "ADIVINA LA PALABRA": stored["ADIVINA LA PALABRA"].length > 0 ? stored["ADIVINA LA PALABRA"] : defaults["ADIVINA LA PALABRA"],
+      "QUIÉN ES MÁS PROBABLE QUE": stored["QUIÉN ES MÁS PROBABLE QUE"].length > 0 ? stored["QUIÉN ES MÁS PROBABLE QUE"] : defaults["QUIÉN ES MÁS PROBABLE QUE"],
+      MÍMICA: stored.MÍMICA.length > 0 ? stored.MÍMICA : defaults.MÍMICA,
     }
-    return merged
   })
   const [newQuestion, setNewQuestion] = useState<Record<TileType, string>>({
     DIBUJAR: "",
@@ -139,12 +152,27 @@ export function QuestionsEditor() {
     "QUIÉN ES MÁS PROBABLE QUE": "",
     MÍMICA: "",
   })
+  const [newAnswer, setNewAnswer] = useState<string>("")
 
   useEffect(() => {
     saveQuestionsToStorage(questions)
   }, [questions])
 
   const addQuestion = (tileType: TileType) => {
+    if (tileType === "CULTURA POPULAR") {
+      const question = newQuestion[tileType].trim()
+      const answer = newAnswer.trim()
+      if (!question) return
+
+      setQuestions((prev) => ({
+        ...prev,
+        [tileType]: [...prev[tileType], { question, answer }],
+      }))
+      setNewQuestion((prev) => ({ ...prev, [tileType]: "" }))
+      setNewAnswer("")
+      return
+    }
+
     const question = newQuestion[tileType].trim()
     if (!question) return
 
@@ -166,7 +194,7 @@ export function QuestionsEditor() {
     const defaults = loadDefaultQuestions()
     setQuestions((prev) => ({
       ...prev,
-      [tileType]: defaults[tileType] || [],
+      [tileType]: defaults[tileType] || (tileType === "CULTURA POPULAR" ? [] : []),
     }))
   }
 
@@ -208,57 +236,127 @@ export function QuestionsEditor() {
                 </Button>
               </div>
 
-              <div className="flex gap-2 mb-4">
-                <input
-                  type="text"
-                  value={newQuestion[tileType]}
-                  onChange={(e) =>
-                    setNewQuestion((prev) => ({
-                      ...prev,
-                      [tileType]: e.target.value,
-                    }))
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      addQuestion(tileType)
-                    }
-                  }}
-                  placeholder="Escribe una nueva pregunta..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <Button
-                  onClick={() => addQuestion(tileType)}
-                  className="bg-green-500 hover:bg-green-600 text-white"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Añadir
-                </Button>
-              </div>
-
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {questions[tileType].length === 0 ? (
-                  <p className="text-gray-500 italic text-center py-4">
-                    No hay preguntas en esta categoría
-                  </p>
-                ) : (
-                  questions[tileType].map((question, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+              {tileType === "CULTURA POPULAR" ? (
+                <>
+                  <div className="flex flex-col gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={newQuestion[tileType]}
+                      onChange={(e) =>
+                        setNewQuestion((prev) => ({
+                          ...prev,
+                          [tileType]: e.target.value,
+                        }))
+                      }
+                      placeholder="Escribe una nueva pregunta..."
+                      className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <input
+                      type="text"
+                      value={newAnswer}
+                      onChange={(e) => setNewAnswer(e.target.value)}
+                      placeholder="Escribe la respuesta..."
+                      className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <Button
+                      onClick={() => addQuestion(tileType)}
+                      className="bg-green-500 hover:bg-green-600 text-white"
                     >
-                      <span className="flex-1 text-gray-800">{question}</span>
-                      <Button
-                        onClick={() => removeQuestion(tileType, index)}
-                        variant="ghost"
-                        size="sm"
-                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  ))
-                )}
-              </div>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Añadir
+                    </Button>
+                  </div>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {questions[tileType].length === 0 ? (
+                      <p className="text-gray-500 italic text-center py-4">
+                        No hay preguntas en esta categoría
+                      </p>
+                    ) : (
+                      questions[tileType].map((item, index) => {
+                        const popItem = item as PopQuestion
+                        return (
+                          <div
+                            key={index}
+                            className="flex flex-col gap-2 p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1">
+                                <p className="text-gray-800 font-medium">{popItem.question}</p>
+                                {popItem.answer && (
+                                  <p className="text-sm text-gray-600 mt-1">
+                                    <span className="font-semibold">Respuesta:</span> {popItem.answer}
+                                  </p>
+                                )}
+                              </div>
+                              <Button
+                                onClick={() => removeQuestion(tileType, index)}
+                                variant="ghost"
+                                size="sm"
+                                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={newQuestion[tileType]}
+                      onChange={(e) =>
+                        setNewQuestion((prev) => ({
+                          ...prev,
+                          [tileType]: e.target.value,
+                        }))
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          addQuestion(tileType)
+                        }
+                      }}
+                      placeholder="Escribe una nueva pregunta..."
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                    <Button
+                      onClick={() => addQuestion(tileType)}
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Añadir
+                    </Button>
+                  </div>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {questions[tileType].length === 0 ? (
+                      <p className="text-gray-500 italic text-center py-4">
+                        No hay preguntas en esta categoría
+                      </p>
+                    ) : (
+                      (questions[tileType] as string[]).map((question, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                        >
+                          <span className="flex-1 text-gray-800">{question}</span>
+                          <Button
+                            onClick={() => removeQuestion(tileType, index)}
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </>
+              )}
               <p className="text-sm text-gray-500 mt-2">
                 Total: {questions[tileType].length} preguntas
               </p>

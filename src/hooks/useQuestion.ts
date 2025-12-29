@@ -8,7 +8,10 @@ import mimeQuestions from "@/data/questions/mime.json"
 
 const STORAGE_KEY = "party-water-questions"
 
-const defaultQuestionMap: Record<TileType, string[]> = {
+type PopQuestion = { question: string; answer: string }
+type QuestionItem = string | PopQuestion
+
+const defaultQuestionMap: Record<TileType, QuestionItem[]> = {
   DIBUJAR: drawQuestions.questions,
   "CULTURA POPULAR": popQuestions.questions,
   "ADIVINA LA PALABRA": guessQuestions.questions,
@@ -16,14 +19,27 @@ const defaultQuestionMap: Record<TileType, string[]> = {
   MÍMICA: mimeQuestions.questions,
 }
 
-function getQuestionsFromStorage(): Record<TileType, string[]> {
+function getQuestionsFromStorage(): Record<TileType, QuestionItem[]> {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     try {
       const parsed = JSON.parse(stored)
-      const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
+      const result: Record<TileType, QuestionItem[]> = {} as Record<TileType, QuestionItem[]>
       for (const type in defaultQuestionMap) {
-        result[type as TileType] = parsed[type] || defaultQuestionMap[type as TileType]
+        const tileType = type as TileType
+        const storedQuestions = parsed[tileType]
+        
+        if (tileType === "CULTURA POPULAR" && storedQuestions) {
+          const migrated = storedQuestions.map((item: string | PopQuestion) => {
+            if (typeof item === "string") {
+              return { question: item, answer: "" }
+            }
+            return item
+          })
+          result[tileType] = migrated.length > 0 ? migrated : defaultQuestionMap[tileType]
+        } else {
+          result[tileType] = storedQuestions || defaultQuestionMap[tileType]
+        }
       }
       return result
     } catch {
@@ -37,17 +53,28 @@ export function useQuestion() {
   const setCurrentQuestion = useGameStore((state) => state.setCurrentQuestion)
   const openQuestionModal = useGameStore((state) => state.openQuestionModal)
 
-  const getRandomQuestion = (tileType: TileType): string => {
+  const getRandomQuestion = (tileType: TileType): { question: string; answer?: string } => {
     const questions = getQuestionsFromStorage()[tileType]
     if (!questions || questions.length === 0) {
-      return defaultQuestionMap[tileType][0] || "Sin preguntas disponibles"
+      const defaultQuestion = defaultQuestionMap[tileType][0]
+      if (typeof defaultQuestion === "string") {
+        return { question: defaultQuestion || "Sin preguntas disponibles" }
+      }
+      return { question: defaultQuestion.question || "Sin preguntas disponibles", answer: defaultQuestion.answer }
     }
-    return questions[Math.floor(Math.random() * questions.length)]
+    
+    const randomItem = questions[Math.floor(Math.random() * questions.length)]
+    
+    if (typeof randomItem === "string") {
+      return { question: randomItem }
+    }
+    
+    return { question: randomItem.question, answer: randomItem.answer }
   }
 
   const showQuestion = (tileType: TileType) => {
-    const question = getRandomQuestion(tileType)
-    setCurrentQuestion(question, tileType)
+    const { question, answer } = getRandomQuestion(tileType)
+    setCurrentQuestion(question, tileType, answer)
     openQuestionModal()
   }
 

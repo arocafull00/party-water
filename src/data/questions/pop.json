@@ -1,18 +1,52 @@
 {
   "questions": [
-    "Cuanto vale un kebab completo en el toni?",
-    "Que numero es el kebab con queso?",
-    "Que dia es el cumple de water?",
-    "Cuantos miembros hay actualmente en water?",
-    "Cuantos emoticonos hay en el nombre de whatsapp de water?",
-    "Que lleva la pizza xema?",
-    "Cuanto vale el bocadillo \"Senda\"?",
-    "Ordena los ganadores del balon de oro",
-    "De donde viene el nombre de \"Waterpolla\"?",
-    "Por que se creo el grupo \"Waterpollo\"?",
-    "Que estudió richar",
-    "De que esta hecho el te favorito de Mora?",
-    "Bebida alcoholica que no encontraba Loro en 2018",
-    "Como se llamaba la ciudad en la que estuvo trabajando Poten en Alemania?"
+    {
+      "question": "Cuanto vale un kebab completo en el toni?",
+      "answer": "4€ el pequeño y 5.5€ el grande"
+    },
+    {
+      "question": "Que numero es el kebab con queso?",
+      "answer": "43"
+    },
+    {
+      "question": "Que dia es el cumple de water?",
+      "answer": "29 de Mayo"
+    },
+    {
+      "question": "Cuantos miembros hay actualmente en water?",
+      "answer": "19"
+    },
+    {
+      "question": "Di 3 emoticonos que esten en el nombre de whatsapp de water?",
+      "answer": "🍻🚬💣💊💉☠🖕🏼"
+    },
+    {
+      "question": "Que lleva la pizza xema?",
+      "answer": "Balon pollo bbq"
+    },
+    {
+      "question": "Ordena los ganadores del balon de oro",
+      "answer": "Joseh, Adriroca, Poten y Hectrol"
+    },
+    {
+      "question": "De donde viene el nombre de \"Waterpolla\"?",
+      "answer": "Jugábamos piscina desnudez a waterpolo"
+    },
+    {
+      "question": "Por que se creo el grupo \"Waterpollo\"?",
+      "answer": "Para evitar a Rubén espinosa"
+    },
+    {
+      "question": "De que esta hecho el te favorito de Mora?",
+      "answer": "Te de campana"
+    },
+    {
+      "question": "Bebida alcoholica que no encontraba Loro en 2018",
+      "answer": "Ron"
+    },
+    {
+      "question": "Como se llamaba la ciudad en la que estuvo trabajando Poten en Alemania?",
+      "answer": "Dusendorf"
+    }
   ]
 }

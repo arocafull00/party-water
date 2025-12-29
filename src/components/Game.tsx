@@ -23,7 +23,7 @@ export function Game() {
 
   return (
     <div className="h-screen flex flex-col p-4 md:p-6 overflow-hidden bg-gray-100">
-      <header className="flex-shrink-0 mb-4">
+      <header className="shrink-0 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
@@ -50,8 +50,8 @@ export function Game() {
           <Board />
         </section>
 
-        <aside className="space-y-3 overflow-y-auto bg-gradient-to-b from-purple-500/10 via-purple-500/5 to-orange-500/10 rounded-2xl p-3 border border-purple-200/30">
-          <div className="bg-gradient-to-r from-purple-500/30 to-orange-500/30 rounded-2xl p-3 border border-purple-300/30">
+        <aside className="space-y-3 overflow-y-auto bg-linear-to-b from-purple-500/10 via-purple-500/5 to-orange-500/10 rounded-2xl p-3 border border-purple-200/30">
+          <div className="bg-linear-to-r from-purple-500/30 to-orange-500/30 rounded-2xl p-3 border border-purple-300/30">
             <p className="text-xs text-gray-700 mb-1">Turno de</p>
             <p className="text-lg font-bold text-gray-900">
               {currentPlayer.name}
