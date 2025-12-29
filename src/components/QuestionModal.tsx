@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useGameStore } from "@/store/useGameStore";
+import { useGameStore, CATEGORY_TIMERS } from "@/store/useGameStore";
 import {
   Dialog,
   DialogContent,
@@ -45,7 +45,8 @@ export function QuestionModal() {
   useEffect(() => {
     if (!isOpen || !isGameStarted) return;
 
-    setTimer(60);
+    const timerValue = currentTileType ? CATEGORY_TIMERS[currentTileType] : 60
+    setTimer(timerValue);
 
     const interval = setInterval(() => {
       const currentTimer = useGameStore.getState().timer;
@@ -59,7 +60,7 @@ export function QuestionModal() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isOpen, isGameStarted, setTimer, answerWrong]);
+  }, [isOpen, isGameStarted, currentTileType, setTimer, answerWrong]);
 
   const handleRevealWord = () => {
     setWordRevealed(true);

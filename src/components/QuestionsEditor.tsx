@@ -24,7 +24,6 @@ const TILE_TYPES: TileType[] = [
 const STORAGE_KEY = "party-water-questions"
 
 type PopQuestion = { question: string; answer: string }
-type QuestionItem = string | PopQuestion
 type QuestionsMap = {
   DIBUJAR: string[]
   "CULTURA POPULAR": PopQuestion[]

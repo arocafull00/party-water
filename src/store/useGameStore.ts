@@ -2,6 +2,14 @@ import { create } from "zustand"
 import { persist } from "zustand/middleware"
 import type { GameState, Player, TileType } from "@/types/game"
 
+export const CATEGORY_TIMERS: Record<TileType, number> = {
+  DIBUJAR: 90,
+  "CULTURA POPULAR": 60,
+  "ADIVINA LA PALABRA": 60,
+  "QUIÉN ES MÁS PROBABLE QUE": 5,
+  MÍMICA: 60,
+}
+
 interface GameStore extends GameState {
   isGameStarted: boolean
   isWordRevealed: boolean
@@ -82,7 +90,11 @@ export const useGameStore = create<GameStore>()(
       setCurrentQuestion: (question, tileType, answer) =>
         set({ currentQuestion: question, currentTileType: tileType, currentAnswer: answer || null }),
 
-      openQuestionModal: () => set({ isQuestionModalOpen: true, timer: 60, isGameStarted: false, isWordRevealed: false }),
+      openQuestionModal: () => {
+        const state = get()
+        const timer = state.currentTileType ? CATEGORY_TIMERS[state.currentTileType] : 60
+        set({ isQuestionModalOpen: true, timer, isGameStarted: false, isWordRevealed: false })
+      },
 
       closeQuestionModal: () =>
         set({
