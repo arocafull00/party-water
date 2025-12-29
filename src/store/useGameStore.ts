@@ -5,9 +5,9 @@ import type { GameState, Player, TileType } from "@/types/game"
 export const CATEGORY_TIMERS: Record<TileType, number> = {
   DIBUJAR: 90,
   "CULTURA POPULAR": 60,
-  "ADIVINA LA PALABRA": 60,
+  "ADIVINA LA PALABRA": 80,
   "QUIÉN ES MÁS PROBABLE QUE": 5,
-  MÍMICA: 60,
+  MÍMICA: 80,
 }
 
 interface GameStore extends GameState {
