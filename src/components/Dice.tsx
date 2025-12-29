@@ -36,7 +36,7 @@ export function Dice() {
   return (
     <div className="fixed top-4 right-4 z-10 flex flex-col items-center gap-2">
       <div className="text-sm font-semibold text-gray-300">
-        Turno: Jugador {currentPlayerIndex + 1}
+        Turno: Equipo {currentPlayerIndex + 1}
       </div>
       <Button
         onClick={handleRollDice}

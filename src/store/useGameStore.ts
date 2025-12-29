@@ -22,7 +22,7 @@ interface GameStore extends GameState {
 const initialPlayers: Player[] = [
   {
     id: 1,
-    name: "Jugador 1",
+    name: "Equipo 1",
     position: 0,
     scores: {
       DIBUJAR: 0,
@@ -34,7 +34,7 @@ const initialPlayers: Player[] = [
   },
   {
     id: 2,
-    name: "Jugador 2",
+    name: "Equipo 2",
     position: 0,
     scores: {
       DIBUJAR: 0,

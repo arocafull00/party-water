@@ -64,7 +64,7 @@ export function Game() {
 
           <div className="space-y-2">
             <h3 className="font-semibold text-xs text-gray-600 uppercase tracking-wide px-1">
-              Jugadores
+              Equipos
             </h3>
             {players.map((player) => (
               <PlayerCard
