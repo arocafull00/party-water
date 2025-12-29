@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useGameStore, CATEGORY_TIMERS } from "@/store/useGameStore";
 import {
   Dialog,
@@ -35,6 +35,10 @@ export function QuestionModal() {
   const answerWrong = useGameStore((state) => state.answerWrong);
   const closeQuestionModal = useGameStore((state) => state.closeQuestionModal);
 
+  const questionKey = useMemo(() => currentQuestion || "", [currentQuestion]);
+  const [revealedQuestionKey, setRevealedQuestionKey] = useState<string>("");
+  const isAnswerRevealed = revealedQuestionKey === questionKey && questionKey !== "";
+
   const isPrivateQuestion = currentTileType
     ? PRIVATE_QUESTIONS.includes(currentTileType)
     : false;
@@ -50,17 +54,16 @@ export function QuestionModal() {
 
     const interval = setInterval(() => {
       const currentTimer = useGameStore.getState().timer;
-      const newTimer = Math.max(0, currentTimer - 1);
-      setTimer(newTimer);
-
-      if (newTimer === 0) {
+      if (currentTimer > 0) {
+        const newTimer = currentTimer - 1;
+        setTimer(newTimer);
+      } else {
         clearInterval(interval);
-        answerWrong();
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isOpen, isGameStarted, currentTileType, setTimer, answerWrong]);
+  }, [isOpen, isGameStarted, currentTileType, setTimer]);
 
   const handleRevealWord = () => {
     setWordRevealed(true);
@@ -96,10 +99,22 @@ export function QuestionModal() {
                 </p>
                 {isPopCulture && currentAnswer && (
                   <div className="mt-4 pt-4 border-t border-gray-700">
-                    <p className="text-sm text-gray-400 mb-2">Respuesta:</p>
-                    <p className="text-lg font-semibold text-green-300">
-                      {currentAnswer}
-                    </p>
+                    {!isAnswerRevealed ? (
+                      <Button
+                        onClick={() => setRevealedQuestionKey(questionKey)}
+                        className="bg-purple-500 hover:bg-purple-600 text-white w-full flex items-center justify-center gap-2"
+                      >
+                        <Eye className="w-5 h-5" />
+                        Mostrar respuesta
+                      </Button>
+                    ) : (
+                      <>
+                        <p className="text-sm text-gray-400 mb-2">Respuesta:</p>
+                        <p className="text-lg font-semibold text-green-300">
+                          {currentAnswer}
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
               </div>

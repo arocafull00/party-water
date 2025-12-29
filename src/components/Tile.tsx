@@ -71,12 +71,6 @@ export function Tile({ tileType, isActive, hasPlayer, onClick }: TileProps) {
           ))}
         </div>
       )}
-
-      <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-30">
-        <div className="bg-gray-800 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap border border-gray-700 text-white shadow-lg">
-          {categoryNames[tileType]}
-        </div>
-      </div>
     </div>
   )
 }
