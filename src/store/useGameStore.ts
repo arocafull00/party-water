@@ -101,7 +101,6 @@ export const useGameStore = create<GameStore>()(
 
       answerCorrect: () => {
         const state = get()
-        const currentPlayer = state.players[state.currentPlayerIndex]
         const tileType = state.currentTileType
 
         if (!tileType) return

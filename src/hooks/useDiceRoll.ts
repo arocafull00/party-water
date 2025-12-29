@@ -3,7 +3,6 @@ import { useGameStore } from "@/store/useGameStore"
 export function useDiceRoll() {
   const setDiceValue = useGameStore((state) => state.setDiceValue)
   const diceValue = useGameStore((state) => state.diceValue)
-  const currentPlayerIndex = useGameStore((state) => state.currentPlayerIndex)
   const movePlayer = useGameStore((state) => state.movePlayer)
 
   const rollDice = () => {

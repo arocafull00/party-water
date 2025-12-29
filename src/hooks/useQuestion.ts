@@ -33,13 +33,9 @@ function getQuestionsFromStorage(): Record<TileType, string[]> {
   return defaultQuestionMap
 }
 
-const questionMap = getQuestionsFromStorage()
-
 export function useQuestion() {
   const setCurrentQuestion = useGameStore((state) => state.setCurrentQuestion)
   const openQuestionModal = useGameStore((state) => state.openQuestionModal)
-  const players = useGameStore((state) => state.players)
-  const currentPlayerIndex = useGameStore((state) => state.currentPlayerIndex)
 
   const getRandomQuestion = (tileType: TileType): string => {
     const questions = getQuestionsFromStorage()[tileType]

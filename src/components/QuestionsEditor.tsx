@@ -26,12 +26,25 @@ function loadQuestionsFromStorage(): Record<TileType, string[]> {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored) {
     try {
-      return JSON.parse(stored)
+      const parsed = JSON.parse(stored)
+      const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
+      for (const type of TILE_TYPES) {
+        result[type] = parsed[type] || []
+      }
+      return result
     } catch {
-      return {}
+      const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
+      for (const type of TILE_TYPES) {
+        result[type] = []
+      }
+      return result
     }
   }
-  return {}
+  const result: Record<TileType, string[]> = {} as Record<TileType, string[]>
+  for (const type of TILE_TYPES) {
+    result[type] = []
+  }
+  return result
 }
 
 function saveQuestionsToStorage(questions: Record<TileType, string[]>) {
